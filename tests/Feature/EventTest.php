@@ -103,3 +103,28 @@ test('events can be retrieved from the database', function () {
     $response->assertStatus(200);
     $response->assertJsonCount(3);
 });
+
+test('a single event can be retireved via id', function () {
+    $event = Event::factory()->create();
+
+    $response = get("/api/events/{$event->id}");
+
+    $response
+        ->assertStatus(200)
+        ->assertJson(fn (AssertableJson $json) =>
+            $json->where('id', $event->id)
+                 ->where('title', $event->title)
+                 ->where('location', $event->location)
+                 ->where('start_date', $event->start_date->toISOString())
+                 ->where('end_date', $event->end_date->toISOString())
+                 ->etc()
+        );
+});
+
+test('a 404 is returned when trying to retrieve a non-existent event', function () {
+    $nonExistentId = Event::max('id') + 1;
+
+    $response = get("/api/events/{$nonExistentId}");
+
+    $response->assertNotFound();
+});
