@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreEventRequest;
 
 class EventController extends Controller
 {
-    public function store(Request $request)
+    public function store(StoreEventRequest $request)
     {
-        // For now, just return back the request data as JSON
-        return response()->json($request->all(), 201);
+        // For now, just return back the validated request data as JSON
+        return response()->json($request->validated(), 201);
     }
 }
