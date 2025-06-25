@@ -3,6 +3,7 @@
 use App\Models\Event;
 use function Pest\Laravel\get;
 use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
@@ -127,4 +128,35 @@ test('a 404 is returned when trying to retrieve a non-existent event', function 
     $response = get("/api/events/{$nonExistentId}");
 
     $response->assertNotFound();
+});
+
+test('an event can be updated via the API', function () {
+    $event = Event::factory()->create();
+
+    $payload = [
+        'title' => 'Updated Event Title',
+        'location' => 'Updated Location',
+        'start_date' => '2025-10-01',
+        'end_date' => '2025-10-02',
+        'description' => 'Updated description for the event.',
+    ];
+
+    $response = putJson("/api/events/{$event->id}", $payload);
+
+    $response
+        ->assertStatus(200)
+        ->assertJson(fn (AssertableJson $json) =>
+            $json->where('id', $event->id)
+                 ->where('title', 'Updated Event Title')
+                 ->where('location', 'Updated Location')
+                 ->where('start_date', '2025-10-01T00:00:00.000000Z')
+                 ->where('end_date', '2025-10-02T00:00:00.000000Z')
+                 ->etc()
+        );
+
+    $this->assertDatabaseHas('events', [
+        'id' => $event->id,
+        'title' => 'Updated Event Title',
+        'location' => 'Updated Location',
+    ]);
 });
