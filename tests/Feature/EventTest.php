@@ -21,8 +21,8 @@ test('an event can be created', function () {
         ->assertJson(fn (AssertableJson $json) =>
             $json->where('title', 'Laravel London')
                  ->where('location', 'London')
-                 ->where('start_date', '2025-09-01')
-                 ->where('end_date', '2025-09-02')
+                 ->where('start_date', '2025-09-01T00:00:00.000000Z')
+                 ->where('end_date', '2025-09-02T00:00:00.000000Z')
                  ->etc()
         );
 });
