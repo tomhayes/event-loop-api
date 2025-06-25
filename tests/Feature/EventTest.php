@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Event;
+use function Pest\Laravel\get;
 use function Pest\Laravel\postJson;
 use Illuminate\Testing\Fluent\AssertableJson;
 
@@ -90,4 +92,14 @@ test('event creation fails if location is missing', function () {
     $response
         ->assertStatus(422)
         ->assertJsonValidationErrors(['location']);
+});
+
+test('events can be retrieved from the database', function () {
+
+    Event::factory()->count(3)->create();
+
+    $response = get('/api/events');
+
+    $response->assertStatus(200);
+    $response->assertJsonCount(3);
 });
