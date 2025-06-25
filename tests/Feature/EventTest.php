@@ -3,6 +3,8 @@
 use function Pest\Laravel\postJson;
 use Illuminate\Testing\Fluent\AssertableJson;
 
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 test('an event can be created', function () {
     $payload = [
         'title' => 'Laravel London',
@@ -23,6 +25,26 @@ test('an event can be created', function () {
                  ->where('end_date', '2025-09-02')
                  ->etc()
         );
+});
+
+test('an event is saved to the database when valid data is provided', function () {
+    $payload = [
+        'title' => 'Laravel London',
+        'location' => 'London',
+        'start_date' => '2025-09-01',
+        'end_date' => '2025-09-02',
+        'description' => 'A meetup for Laravel developers in the UK',
+    ];
+
+    postJson('/api/events', $payload);
+
+    $this->assertDatabaseHas('events', [
+        'title' => 'Laravel London',
+        'location' => 'London',
+        'start_date' => '2025-09-01 00:00:00',
+        'end_date' => '2025-09-02 00:00:00',
+        'description' => 'A meetup for Laravel developers in the UK',
+    ]);
 });
 
 test('event creation fails without a title', function () {
