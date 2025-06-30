@@ -23,12 +23,29 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $firstName = fake()->firstName();
+        $lastName = fake()->lastName();
+        $username = strtolower($firstName . '.' . $lastName . fake()->numberBetween(1, 999));
+        
         return [
-            'name' => fake()->name(),
+            'name' => $firstName . ' ' . $lastName,
+            'username' => $username,
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => 'attendee',
+            'is_active' => true,
+            'preferences' => [
+                'email_notifications' => fake()->boolean(80),
+                'weekly_digest' => fake()->boolean(60),
+                'event_reminders' => fake()->boolean(90),
+                'preferred_topics' => fake()->randomElements([
+                    'JavaScript', 'React', 'Vue', 'Node.js', 'Python', 'Django', 
+                    'PHP', 'Laravel', 'Ruby', 'Java', 'Go', 'Rust', 'DevOps', 
+                    'Docker', 'Kubernetes', 'AWS', 'Machine Learning', 'AI'
+                ], fake()->numberBetween(2, 6))
+            ]
         ];
     }
 
@@ -39,6 +56,26 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Create an organizer user.
+     */
+    public function organizer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'organizer',
+        ]);
+    }
+
+    /**
+     * Create an admin user.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
         ]);
     }
 }

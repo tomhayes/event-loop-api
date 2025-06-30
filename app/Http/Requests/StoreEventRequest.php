@@ -27,6 +27,10 @@ class StoreEventRequest extends FormRequest
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'description' => 'nullable|string',
+            'short_description' => 'nullable|string|max:200',
+            'long_description' => 'nullable|string',
+            'header_image' => 'nullable|string',
+            'organizer_logo' => 'nullable|string',
         ];
     }
 }
